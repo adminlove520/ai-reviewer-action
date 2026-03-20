@@ -25,5 +25,5 @@ inputs:
     default: 'summary'
 
 runs:
-  using: 'python'
-  main: 'action.py'
+  using: 'node20'
+  main: 'index.js'

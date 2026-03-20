@@ -1,0 +1,9 @@
+{
+  "name": "ai-reviewer-action",
+  "description": "AI Code Review GitHub Action",
+  "version": "v1",
+  "runs": {
+    "using": "node20",
+    "main": "dist/index.js"
+  }
+}

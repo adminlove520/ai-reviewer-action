@@ -1,9 +1,29 @@
-{
-  "name": "ai-reviewer-action",
-  "description": "AI Code Review GitHub Action",
-  "version": "v1",
-  "runs": {
-    "using": "node20",
-    "main": "dist/index.js"
-  }
-}
+name: 'AI Code Review'
+description: '基于大模型的自动化代码审查 GitHub Action'
+author: 'adminlove520'
+version: '1.0.0'
+
+inputs:
+  github-token:
+    description: 'GitHub Token'
+    required: true
+  llm-provider:
+    description: 'LLM Provider (deepseek/openai/anthropic/qwen/zhipuai/minimax)'
+    required: false
+    default: 'deepseek'
+  llm-model:
+    description: 'LLM Model'
+    required: false
+    default: ''
+  review-style:
+    description: 'Review style (professional/sarcastic/gentle/humorous)'
+    required: false
+    default: 'professional'
+  comment-mode:
+    description: 'Comment mode (summary/detailed)'
+    required: false
+    default: 'summary'
+
+runs:
+  using: 'node20'
+  main: 'index.js'

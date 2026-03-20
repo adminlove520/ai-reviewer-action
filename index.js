@@ -1,14 +1,10 @@
 // AI Code Review GitHub Action - Pure JS, no dependencies
 
-// 获取输入 - GitHub Actions 格式
 function getInput(name) {
-  // GitHub Actions 自动将输入名转为大写并添加 INPUT_ 前缀
-  // 例如: github-token -> INPUT_GITHUB_TOKEN
   const key = `INPUT_${name.replace(/-/g, '_').toUpperCase()}`;
   return process.env[key] || '';
 }
 
-// 输出
 function log(message) {
   console.log(message);
 }
@@ -24,6 +20,7 @@ function setFailed(message) {
 
 function run() {
   try {
+    // 使用 secrets 而不是 vars
     const githubToken = process.env.GITHUB_TOKEN || '';
     const llmProvider = getInput('llm-provider') || 'deepseek';
     const reviewStyle = getInput('review-style') || 'professional';
@@ -39,7 +36,7 @@ function run() {
     log(`GitHub Token: ${githubToken ? '✓ Configured' : '✗ Not found'}`);
     log('');
     
-    // 检查 API keys
+    // 检查环境变量中的 API keys (secrets 会转为大写)
     const apiKeys = {
       deepseek: process.env.DEEPSEEK_API_KEY,
       openai: process.env.OPENAI_API_KEY,
@@ -49,11 +46,22 @@ function run() {
       minimax: process.env.MINIMAX_API_KEY
     };
     
+    // 打印所有环境变量 (调试用)
+    log('Environment variables:');
+    for (const [key, value] of Object.entries(process.env)) {
+      if (key.includes('API_KEY')) {
+        log(`  ${key}: ${value ? '✓ Set' : '✗ Not set'}`);
+      }
+    }
+    log('');
+    
     const apiKey = apiKeys[llmProvider.toLowerCase()];
     
     if (!apiKey) {
       log('⚠️  No API key configured!');
-      log(`   Please set ${llmProvider.toUpperCase()}_API_KEY in secrets`);
+      log(`   Please set ${llmProvider.toUpperCase()}_API_KEY in repository secrets`);
+      log('');
+      log('   Go to: Repository Settings -> Secrets and variables -> Actions');
       log('');
       log('========================================');
       log('   Action Completed (No API Key)');

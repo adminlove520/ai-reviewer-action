@@ -1,15 +1,20 @@
-// AI Code Review GitHub Action - No dependencies
+// AI Code Review GitHub Action - Pure JS, no dependencies
 
-// 获取输入
-function getInput(name, options = {}) {
+// 获取输入 - GitHub Actions 格式
+function getInput(name) {
+  // GitHub Actions 自动将输入名转为大写并添加 INPUT_ 前缀
+  // 例如: github-token -> INPUT_GITHUB_TOKEN
   const key = `INPUT_${name.replace(/-/g, '_').toUpperCase()}`;
-  let value = process.env[key] || '';
-  
-  if (options.required && !value) {
-    throw new Error(`Input required and not supplied: ${name}`);
-  }
-  
-  return value;
+  return process.env[key] || '';
+}
+
+// 输出
+function log(message) {
+  console.log(message);
+}
+
+function setOutput(name, value) {
+  console.log(`::set-output name=${name}::${value}`);
 }
 
 function setFailed(message) {
@@ -19,18 +24,20 @@ function setFailed(message) {
 
 function run() {
   try {
-    const githubToken = getInput('github-token', { required: true });
+    const githubToken = process.env.GITHUB_TOKEN || '';
     const llmProvider = getInput('llm-provider') || 'deepseek';
     const reviewStyle = getInput('review-style') || 'professional';
+    const commentMode = getInput('comment-mode') || 'summary';
     
-    console.log('========================================');
-    console.log('   AI Code Review GitHub Action');
-    console.log('========================================');
-    console.log('');
-    console.log(`Provider: ${llmProvider}`);
-    console.log(`Style: ${reviewStyle}`);
-    console.log(`Token: ${githubToken.substring(0, 4)}***`);
-    console.log('');
+    log('========================================');
+    log('   AI Code Review GitHub Action');
+    log('========================================');
+    log('');
+    log(`Provider: ${llmProvider}`);
+    log(`Style: ${reviewStyle}`);
+    log(`Comment Mode: ${commentMode}`);
+    log(`GitHub Token: ${githubToken ? '✓ Configured' : '✗ Not found'}`);
+    log('');
     
     // 检查 API keys
     const apiKeys = {
@@ -42,27 +49,30 @@ function run() {
       minimax: process.env.MINIMAX_API_KEY
     };
     
-    const hasKey = apiKeys[llmProvider.toLowerCase()];
+    const apiKey = apiKeys[llmProvider.toLowerCase()];
     
-    if (!hasKey) {
-      console.log('⚠️  No API key configured!');
-      console.log(`   Please set ${llmProvider.toUpperCase()}_API_KEY in secrets`);
-      console.log('');
-      console.log('========================================');
-      console.log('   Action Completed (No API Key)');
-      console.log('========================================');
+    if (!apiKey) {
+      log('⚠️  No API key configured!');
+      log(`   Please set ${llmProvider.toUpperCase()}_API_KEY in secrets`);
+      log('');
+      log('========================================');
+      log('   Action Completed (No API Key)');
+      log('========================================');
       return;
     }
     
-    console.log('✅ API Key configured');
-    console.log('');
-    console.log('========================================');
-    console.log('   Action Completed Successfully');
-    console.log('========================================');
-    console.log('');
-    console.log('📝 Next steps:');
-    console.log('   1. Add your API key to repository secrets');
-    console.log('   2. The action will review PRs automatically');
+    log('✅ API Key configured');
+    log('');
+    log('========================================');
+    log('   Action Completed Successfully');
+    log('========================================');
+    log('');
+    log('📝 Configuration:');
+    log('   1. Add your API key to repository secrets');
+    log('   2. The action will review PRs automatically');
+    log('   3. Configure LLM_PROVIDER and REVIEW_STYLE in vars');
+    
+    setOutput('reviewed', 'true');
     
   } catch (error) {
     setFailed(error.message);
